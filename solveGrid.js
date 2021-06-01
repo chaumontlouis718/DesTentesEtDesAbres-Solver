@@ -11,40 +11,29 @@ Grille :
 2 : T : Tente
 3 : Gazon
 
-{
-    'taille' : 5,
-    'sommeColonnes' : [2,0,2,0,2],
-    'sommeLignes' : [1,2,0,3,1], 
-    'grid' : [
-        [0,0,0,1,0],
-        [0,1,0,0,0],
-        [0,0,1,0,1],
-        [0,0,0,1,0],
-        [0,1,0,0,0]
-    ]  
-}
-
 */
 
 var gridToSolve = {
-    'taille' : 6,
-    'sommeColonnes' : [3,0,1,1,1,1],
-    'sommeLignes' : [1,2,1,1,2,1], 
+    'taille' : 7,
+    'sommeColonnes' : [3,1,1,2,1,2,1],
+    'sommeLignes' : [2,2,1,2,1,1,2], 
     'grid' : [
-        [0,0,1,0,0,0],
-        [1,0,0,1,0,0],
-        [0,0,0,1,0,0],
-        [1,0,0,0,0,0],
-        [0,1,1,0,0,0],
-        [0,0,0,0,0,1]
+        [0,0,1,0,0,1,0],
+        [1,0,0,1,0,0,0],
+        [0,0,0,1,0,0,0],
+        [1,0,0,0,1,0,0],
+        [0,1,0,0,0,0,0],
+        [0,1,0,1,1,0,0],
+        [0,0,0,0,0,0,0]
     ],
     'gridInversed' : [
-        [0,1,0,1,0,0],
-        [0,0,0,0,1,0],
-        [1,0,0,0,1,0],
-        [0,1,1,0,0,0],
-        [0,0,0,0,0,0],
-        [0,0,0,0,0,1]
+        [0,1,0,1,0,0,0],
+        [0,0,0,0,1,1,0],
+        [1,0,0,0,0,0,0],
+        [0,1,1,0,0,1,0],
+        [0,0,0,1,0,1,0],
+        [1,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
     ]
 }
 
@@ -93,10 +82,8 @@ function applyStrategieUn() {
         } else {
             var caseDisponible = countCaseDisponibles(gridToSolve.gridInversed[indexSommeColonne])
             if (caseDisponible.nbrTenteDejaPlaces == indicateurColonne && caseDisponible.nbrBlackSquare != 0) {
-                console.log("Remplace all by gazon colonne : "+indexSommeColonne)
                 replaceAllBlackSquareByGazonColonne(indexSommeColonne)
-            } else if (caseDisponible.nbrBlackSquare == indicateurColonne    - caseDisponible.nbrTenteDejaPlaces) {
-                console.log("Remplace all by tente colonne : "+indexSommeColonne)
+            } else if (caseDisponible.nbrBlackSquare == indicateurColonne - caseDisponible.nbrTenteDejaPlaces) {
                 replaceAllBlackSquareByTenteColonne(indexSommeColonne)
             }
         }
@@ -108,10 +95,8 @@ function applyStrategieUn() {
         } else {
             var caseDisponible = countCaseDisponibles(gridToSolve.grid[indexSommeLigne])
             if (caseDisponible.nbrTenteDejaPlaces == indicateurLigne && caseDisponible.nbrBlackSquare != 0) {
-                console.log("Remplace all by gazon ligne : "+indexSommeLigne)
                 replaceAllBlackSquareByGazonLigne(indexSommeLigne)
             } else if (caseDisponible.nbrBlackSquare == indicateurLigne - caseDisponible.nbrTenteDejaPlaces) {
-                console.log("Remplace all by tente ligne : "+indexSommeLigne)
                 replaceAllBlackSquareByTenteLigne(indexSommeLigne)
             }
         }
@@ -180,10 +165,52 @@ function reducerCountCaseDisponibles(accumulator, currentValue) {
 
 function applyChangeToInversedGrid(value, indexLigne,indexColonne) {
     gridToSolve.gridInversed[indexColonne][indexLigne] = value;
+    applyChangeToGridSecondCall(value, indexLigne,indexColonne)
+}
+
+function applyChangeToInversedGridSecondCall(value, indexLigne,indexColonne) {
+    gridToSolve.gridInversed[indexColonne][indexLigne] = value;
 }
 
 function applyChangeToGrid(value, indexLigne,indexColonne) {
+    console.log("IndexLigne : "+indexLigne + " / IndexColonne : "+indexColonne+" / Value : "+value)
     gridToSolve.grid[indexLigne][indexColonne] = value;
+    applyChangeToInversedGridSecondCall(value, indexLigne,indexColonne)
+    if(value == 2) {
+        gazonAutourTente(indexLigne,indexColonne);
+    }
+}
+
+function applyChangeToGridSecondCall(value, indexLigne,indexColonne) {
+    console.log("IndexLigne : "+indexLigne + " / IndexColonne : "+indexColonne+" / Value : "+value)
+    gridToSolve.grid[indexLigne][indexColonne] = value;
+}
+
+function gazonAutourTente(indexLigne, indexColonne) {
+    if (gridToSolve.grid[indexLigne-1] != null && gridToSolve.grid[indexLigne-1][indexColonne-1] != null && gridToSolve.grid[indexLigne-1][indexColonne-1] == 0) {
+        applyChangeToGrid(3,indexLigne-1,indexColonne-1);
+    }
+    if (gridToSolve.grid[indexLigne-1] != null && gridToSolve.grid[indexLigne-1][indexColonne] != null && gridToSolve.grid[indexLigne-1][indexColonne] == 0) {
+        applyChangeToGrid(3,indexLigne-1,indexColonne);
+    }
+    if (gridToSolve.grid[indexLigne-1] != null && gridToSolve.grid[indexLigne-1][indexColonne] != null && gridToSolve.grid[indexLigne-1][indexColonne+1] == 0) {
+        applyChangeToGrid(3,indexLigne-1,indexColonne+1);
+    }
+    if (gridToSolve.grid[indexLigne][indexColonne-1] != null && gridToSolve.grid[indexLigne][indexColonne-1] == 0) {
+        applyChangeToGrid(3,indexLigne,indexColonne-1);
+    }
+    if (gridToSolve.grid[indexLigne][indexColonne+1] != null && gridToSolve.grid[indexLigne][indexColonne+1] == 0) {
+        applyChangeToGrid(3,indexLigne,indexColonne+1);
+    }
+    if (gridToSolve.grid[indexLigne+1] != null && gridToSolve.grid[indexLigne+1][indexColonne-1] != null && gridToSolve.grid[indexLigne+1][indexColonne-1] == 0) {
+        applyChangeToGrid(3,indexLigne+1,indexColonne-1);
+    }
+    if (gridToSolve.grid[indexLigne+1] != null && gridToSolve.grid[indexLigne+1][indexColonne] != null && gridToSolve.grid[indexLigne+1][indexColonne] == 0) {
+        applyChangeToGrid(3,indexLigne+1,indexColonne);
+    }
+    if (gridToSolve.grid[indexLigne+1] != null && gridToSolve.grid[indexLigne+1][indexColonne+1] != null && gridToSolve.grid[indexLigne+1][indexColonne+1] == 0) {
+        applyChangeToGrid(3,indexLigne+1,indexColonne+1);
+    }
 }
 
 function logGrid() {
