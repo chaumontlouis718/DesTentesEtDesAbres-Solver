@@ -1,3 +1,10 @@
+$( document ).ready(function() {
+    appendGridToDocument("gridToSolve")
+    cycleResolve()
+    logGrid();
+    appendGridToDocument("gridResolved")
+});
+
 /*
 Grille : 
     OOTAO
@@ -14,7 +21,6 @@ Grille :
 */
 
 var gridToSolve = {
-    'taille' : 8,
     'sommeColonnes' : [3,1,2,1,2,1,0,4],
     'sommeLignes' : [2,1,3,1,2,1,1,3], 
     'grid' : [
@@ -45,7 +51,6 @@ var tempBoucle = 0;
 function cycleResolve() {
     applyStrategieZero();
     do {
-        console.log("Cycle "+tempBoucle+" /////")
         tempBoucle++;
         casesModifie = 0;
         applyStrategieUn();
@@ -123,20 +128,12 @@ function applyStrategieDeux() {
             return !flag;
         })
 
-        /*
-        console.log(results.map(function(line) {
-            return line.join()
-        }))
-        */
-
         var temps = results[0];
         results.forEach(function(combinaisons) {
             temps = temps.filter(function(element) {
                 return combinaisons.includes(element)
             })
         })
-
-        //console.log(temps);
 
         if (typeof temps !== 'undefined' && temps > 0) {
             temps.forEach(function(element) {
@@ -163,20 +160,12 @@ function applyStrategieDeux() {
             return !flag;
         })
 
-        /*
-        console.log(results.map(function(colonne) {
-            return colonne.join()
-        }))
-        */
-
         var temps = results[0];
         results.forEach(function(combinaisons) {
             temps = temps.filter(function(element) {
                 return combinaisons.includes(element)
             })
         })
-
-        //console.log(temps);
 
         if (typeof temps !== 'undefined' && temps > 0) {
             temps.forEach(function(element) {
@@ -308,7 +297,6 @@ function applyChangeToInversedGridSecondCall(value, indexLigne,indexColonne) {
 }
 
 function applyChangeToGrid(value, indexLigne,indexColonne) {
-    console.log("IndexLigne : "+indexLigne + " / IndexColonne : "+indexColonne+" / Value : "+value)
     gridToSolve.grid[indexLigne][indexColonne] = value;
     casesModifie++;
     applyChangeToInversedGridSecondCall(value, indexLigne,indexColonne)
@@ -318,7 +306,6 @@ function applyChangeToGrid(value, indexLigne,indexColonne) {
 }
 
 function applyChangeToGridSecondCall(value, indexLigne,indexColonne) {
-    console.log("IndexLigne : "+indexLigne + " / IndexColonne : "+indexColonne+" / Value : "+value)
     gridToSolve.grid[indexLigne][indexColonne] = value;
 }
 
@@ -360,7 +347,20 @@ function logGrid() {
     }))
 }
 
-logGrid();
-cycleResolve()
-console.log("////////////////////////////////////////////////////////////")
-logGrid();
+function appendGridToDocument(idTable) {
+    gridToSolve.grid.forEach(function(line) {
+        var trContent = "";
+        line.forEach(function(cases) {
+            if (cases == 0) {
+                trContent += "<td class='vide'></td>"
+            } else if (cases == 1) {
+                trContent += "<td class='arbre'></td>"
+            } else if (cases == 2) {
+                trContent += "<td class='tente'></td>"
+            } else if (cases == 3) {
+                trContent += "<td class='gazon'></td>"
+            }
+        })
+        $("#"+idTable).append("<tr>"+trContent+"</tr>")
+    })
+}

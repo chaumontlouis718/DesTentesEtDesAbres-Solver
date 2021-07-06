@@ -1,58 +1,98 @@
-var sizeTab = 5;
-var nbrTente = Math.floor((sizeTab*sizeTab) * 0.20);
-var pickedPos = [];
-var index = 0;
-var x,y;
-var temp = 0;
+var gridSize = 5;
+var nbrTente = Math.round((gridSize*gridSize) * 0.20);
 
-for (var i =0; i<nbrTente; i++) {
-    temp = 0;   
-    do {
-        x = Math.floor(Math.random()*sizeTab)+1;
-        y = Math.floor(Math.random()*sizeTab)+1;
-        temp++;
-    } while(!checkValidity(x,y) && temp < 1000)
+var pickedPos = []
 
-    pickedPos.push({
-        'x':x,
-        'y':y
-    })
-}
 
-console.log(pickedPos)
-displayAsTable()
+for (var i=0;i<nbrTente;i++) {
+    var valid = false;
+    var stamp = 0;
+    while(!valid && stamp < 100) {
+        valid = true;
+        var pickedX = Math.floor(Math.random()*5) + 1
+        var pickedY = Math.floor(Math.random()*5) + 1
 
-function checkValidity(x,y) {
-    var returnStatus = true;
-    pickedPos.forEach(function(value) {
-        if (value.x -1 <= x && x <= value.x + 1) {
-            if (value.y -1 <= y && y <= value.y + 1) {
-                returnStatus = false;
-            }
-        }
-    })
-    return returnStatus;
-}
-
-function displayAsTable() {
-    var stringToLog = "";
-    var IsIn = false;
-    for(var i = 0;i< sizeTab;i++) {
-        for(var j = 0;j< sizeTab;j++) {
-            IsInTag : for(var h = 0;h< pickedPos.length;h++) {
-                if (pickedPos[h].x == i+1 && pickedPos[h].y == j+1) {
-                    IsIn = true;
-                    break IsInTag;
+        pickedPos.forEach(function(alreadyPickedPos) {
+            if (alreadyPickedPos.x >= pickedX -1 && alreadyPickedPos.x <= pickedX + 1 &&
+                alreadyPickedPos.y >= pickedY -1 && alreadyPickedPos.y <= pickedY + 1) {
+                    valid = false;
                 }
-            }
-            if (IsIn) {
-                stringToLog += "T"
-            } else {
-                stringToLog += "O"
-            }
-            IsIn = false;
+        })
+
+        var treeAvailable = false
+        var pickedTreeX
+        var pickedTreeY
+
+        if (valid) {
+            pickedTreeX = pickedX-1
+            pickedTreeY = pickedY
+            treeAvailable = true;
+            pickedPos.forEach(function(alreadyPickedPos) {
+                if ((alreadyPickedPos.x == pickedTreeX && alreadyPickedPos.y == pickedTreeY) ||
+                    (alreadyPickedPos.treeX == pickedTreeX && alreadyPickedPos.treeY == pickedTreeY)) {
+                        treeAvailable = false;
+                    }
+            })
         }
-        console.log(stringToLog)
-        stringToLog = "";
+
+        if (valid && !treeAvailable) {
+            pickedTreeX = pickedX
+            pickedTreeY = pickedY-1
+            treeAvailable = true;
+            pickedPos.forEach(function(alreadyPickedPos) {
+                if ((alreadyPickedPos.x == pickedTreeX && alreadyPickedPos.y == pickedTreeY) ||
+                    (alreadyPickedPos.treeX == pickedTreeX && alreadyPickedPos.treeY == pickedTreeY)) {
+                        treeAvailable = false;
+                    }
+            })
+        }
+
+        if (valid && !treeAvailable) {
+            pickedTreeX = pickedX
+            pickedTreeY = pickedY+1
+            treeAvailable = true;
+            pickedPos.forEach(function(alreadyPickedPos) {
+                if ((alreadyPickedPos.x == pickedTreeX && alreadyPickedPos.y == pickedTreeY) ||
+                    (alreadyPickedPos.treeX == pickedTreeX && alreadyPickedPos.treeY == pickedTreeY)) {
+                        treeAvailable = false;
+                    }
+            })
+        }
+
+        if (valid && !treeAvailable) {
+            pickedTreeX = pickedX+1
+            pickedTreeY = pickedY
+            treeAvailable = true;
+            pickedPos.forEach(function(alreadyPickedPos) {
+                if ((alreadyPickedPos.x == pickedTreeX && alreadyPickedPos.y == pickedTreeY) ||
+                    (alreadyPickedPos.treeX == pickedTreeX && alreadyPickedPos.treeY == pickedTreeY)) {
+                        treeAvailable = false;
+                    }
+            })
+        }
+
+        if (valid && treeAvailable) {
+            pickedPos.push({
+                'x' : pickedX,
+                'y' : pickedY,
+                'treeX' : pickedTreeX,
+                'treeY' : pickedTreeY
+            })
+        }
+        stamp++;
     }
+}
+
+cl(pickedPos)
+
+
+
+
+
+
+
+
+
+function cl(message) {
+    console.log(message)
 }
